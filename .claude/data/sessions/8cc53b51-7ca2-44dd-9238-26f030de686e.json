@@ -1,0 +1,7 @@
+{
+  "session_id": "8cc53b51-7ca2-44dd-9238-26f030de686e",
+  "prompts": [
+    "create venv and install requirements",
+    "mcp_server.py"
+  ]
+}

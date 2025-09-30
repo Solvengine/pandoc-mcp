@@ -1,0 +1,7 @@
+{
+  "session_id": "02162893-4e25-43fd-b7df-3e19936c82ac",
+  "prompts": [
+    "passe mcp_server.py an: bilder sollen in einem lokales verzeichnis gespeichert werden und nur der dateifpad zur\u00fcckgegeben werden",
+    "der mcp server soll den dateinpfad f\u00fcr den wpeicherort akzeptieren"
+  ]
+}
