@@ -1,172 +1,238 @@
 #!/usr/bin/env python3
 """
-MCP-Server für Google Gemini API (Veo-Video & Imagen-Bilder)
+MCP-Server für Meta Graph API (Marketing & Lead Generation)
 Startet als STDIO-Server für Claude Code / Desktop.
 
 Benötigt:
-  pip install modelcontextprotocol[server] fastmcp google-genai python-dotenv
-  GOOGLE_API_KEY in .env oder als Umgebungsvariable setzen
+  pip install fastmcp requests python-dotenv
+  META_ACCESS_TOKEN in .env oder als Umgebungsvariable setzen
 """
 
 import os
-import base64
-import time
 import logging
-from datetime import datetime
-from pathlib import Path
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
+import requests
 
 # -----------------------------------------------------------------------------
 # Grund-Setup
 # -----------------------------------------------------------------------------
 logging.basicConfig(level=logging.INFO)
-logging.info("Launching MCP…")
+logging.info("Launching Meta Graph MCP…")
 
-load_dotenv()  # liest GOOGLE_API_KEY aus .env
-mcp = FastMCP("veo")
-
-# Ausgabeverzeichnis für generierte Dateien
-OUTPUT_DIR = Path("generated_files")
-OUTPUT_DIR.mkdir(exist_ok=True)
+load_dotenv()  # liest META_ACCESS_TOKEN aus .env
+mcp = FastMCP("MetaGraph")
 
 # -----------------------------------------------------------------------------
-# Google Gemini API Client
+# Meta Graph API Client
 # -----------------------------------------------------------------------------
-from google import genai
-from google.genai import types
+def _client():
+    """Erzeugt Session mit Meta Graph API Credentials"""
+    access_token = os.getenv("META_ACCESS_TOKEN")
+    api_version = os.getenv("META_API_VERSION", "v23.0")
+
+    if not access_token:
+        raise RuntimeError("META_ACCESS_TOKEN not set")
+
+    base_url = f"https://graph.facebook.com/{api_version}"
+
+    session = requests.Session()
+    session.params = {"access_token": access_token}
+
+    return session, base_url
 
 
-def _client() -> genai.Client:
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise RuntimeError("GOOGLE_API_KEY not set")
-    return genai.Client(api_key=api_key)
+def _ad_account_id():
+    """Gibt die konfigurierte Ad Account ID zurück"""
+    account_id = os.getenv("META_AD_ACCOUNT_ID")
+    if not account_id:
+        raise RuntimeError("META_AD_ACCOUNT_ID not set")
+    return account_id
 
 
 # -----------------------------------------------------------------------------
 # Tools
 # -----------------------------------------------------------------------------
 @mcp.tool()
-def healthcheck() -> str:
-    """Einfacher Server-Check."""
-    return "ok"
+def meta_me() -> str:
+    """Schneller Check, ob das Token funktioniert (gibt User oder Page-Kontext zurück)."""
+    session, base_url = _client()
+    resp = session.get(f"{base_url}/me")
+    return resp.text
 
 
 @mcp.tool()
-def generate_image(
-    prompt: str,
-    model: str = "imagen-4.0-generate-001",
-    output_path: str = None,
+def marketing_create_campaign(
+    name: str,
+    objective: str,
+    status: str = "PAUSED"
 ) -> str:
     """
-    Erzeugt ein Social-Media-Bild via Google Imagen.
-    Rückgabe: Dateipfad zum gespeicherten Bild.
-
-    Args:
-        prompt: Beschreibung des zu generierenden Bildes
-        model: Modell-ID (Standard: imagen-4.0-generate-001)
-        output_path: Optional - vollständiger Dateipfad oder Verzeichnis zum Speichern
+    Lege eine Kampagne im Werbekonto an.
+    objective z.B.: 'LEAD_GENERATION', 'AWARENESS', 'TRAFFIC', 'ENGAGEMENT', 'SALES' (je nach Version).
+    status standardmäßig 'PAUSED', um sicher zu starten.
     """
-    client = _client()
-    resp = client.models.generate_images(model=model, prompt=prompt)
+    session, base_url = _client()
+    ad_account_id = _ad_account_id()
 
-    if not resp.generated_images:
-        raise RuntimeError("No images generated")
+    url = f"{base_url}/{ad_account_id}/campaigns"
+    data = {
+        "name": name,
+        "objective": objective,
+        "status": status,
+        "special_ad_categories": []  # Leer, falls keine Kategorien (z.B. Housing, Credit)
+    }
 
-    img = resp.generated_images[0].image
-    data = getattr(img, "image_bytes", None) or getattr(img, "bytes", None)
-    if not data:
-        raise RuntimeError("No image bytes in response")
+    resp = session.post(url, json=data)
+    result = resp.json()
 
-    # Zielpfad bestimmen
-    if output_path:
-        filepath = Path(output_path)
-        if filepath.is_dir():
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"image_{timestamp}.png"
-            filepath = filepath / filename
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-    else:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"image_{timestamp}.png"
-        filepath = OUTPUT_DIR / filename
-
-    # Bild speichern
-    filepath.write_bytes(data)
-    logging.info("Image saved to: %s", filepath)
-
-    return str(filepath.absolute())
+    logging.info(f"Campaign created: {result}")
+    return str(result)
 
 
 @mcp.tool()
-def generate_video(
-    prompt: str,
-    model: str = "veo-3.0-generate-001",  # Alternativ: veo-3.0-fast-generate-001
-    aspect_ratio: str = None,             # z.B. "9:16" für Reels
-    resolution: str = None,               # "720p" oder "1080p"
-    output_path: str = None,
-    poll_interval: int = 5,
+def marketing_upload_image_from_url(image_url: str) -> str:
+    """
+    Lade ein Bild hoch und erhalte image_hash, um es später in Ad Creatives zu verwenden.
+    """
+    session, base_url = _client()
+    ad_account_id = _ad_account_id()
+
+    url = f"{base_url}/{ad_account_id}/adimages"
+    data = {"url": image_url}
+
+    resp = session.post(url, json=data)
+    result = resp.json()
+
+    logging.info(f"Image upload response: {result}")
+
+    # Extrahiere Hash aus der Response
+    images = result.get("images", {})
+    for key, value in images.items():
+        image_hash = value.get("hash")
+        if image_hash:
+            return image_hash
+
+    return str(result)
+
+
+@mcp.tool()
+def marketing_create_ad(
+    name: str,
+    adset_id: str,
+    creative_id: str,
+    status: str = "PAUSED"
 ) -> str:
     """
-    Erzeugt ein kurzes Video via Google Veo 3.
-    Rückgabe: Dateipfad zum gespeicherten Video.
+    Erstelle eine Ad (Anzeige) im Werbekonto.
 
     Args:
-        prompt: Beschreibung des zu generierenden Videos
-        model: Modell-ID (Standard: veo-3.0-generate-001)
-        aspect_ratio: Optional - z.B. "9:16" für Reels
-        resolution: Optional - "720p" oder "1080p"
-        output_path: Optional - vollständiger Dateipfad oder Verzeichnis zum Speichern
-        poll_interval: Polling-Intervall in Sekunden (Standard: 5)
+        name: Name der Anzeige
+        adset_id: ID des Ad Sets (muss existieren)
+        creative_id: ID des Ad Creative (muss existieren)
+        status: Status (PAUSED oder ACTIVE)
     """
-    client = _client()
+    session, base_url = _client()
+    ad_account_id = _ad_account_id()
 
-    cfg = None
-    if aspect_ratio or resolution:
-        cfg = types.GenerateVideosConfig(
-            aspect_ratio=aspect_ratio if aspect_ratio else None,
-            resolution=resolution if resolution else None,
-        )
+    url = f"{base_url}/{ad_account_id}/ads"
+    data = {
+        "name": name,
+        "adset_id": adset_id,
+        "creative": {"creative_id": creative_id},
+        "status": status
+    }
 
-    op = client.models.generate_videos(model=model, prompt=prompt, config=cfg)
-    logging.info("Video generation started: %s", op.name)
+    resp = session.post(url, json=data)
+    result = resp.json()
 
-    # Polling, bis Operation fertig ist
-    while not op.done:
-        time.sleep(poll_interval)
-        op = client.operations.get(op)
-        logging.info("…waiting for video generation (%s)", op.name)
+    logging.info(f"Ad created: {result}")
+    return str(result)
 
-    if not op.response.generated_videos:
-        raise RuntimeError("No video returned in operation response")
 
-    gv = op.response.generated_videos[0]
+@mcp.tool()
+def leads_create_instant_form(
+    name: str,
+    privacy_policy_url: str,
+    page_id: str = None,
+    questions_json: str = None,
+    follow_up_url: str = None,
+    thank_you_text: str = "Danke! Wir melden uns in Kürze.",
+    locale: str = "de_DE",
+    button_type: str = "VIEW_WEBSITE"
+) -> str:
+    """
+    Erstelle eine Instant Lead Form (Leadgen-Formular) auf einer Page.
+    - questions_json: JSON-String mit Fragen. Beispiel siehe unten.
+    - button_type: VIEW_WEBSITE | CALL_BUSINESS | DOWNLOAD | SCHEDULE_APPOINTMENT | NONE | ...
 
-    # Video herunterladen (füllt gv.video.video_bytes)
-    client.files.download(file=gv.video)
-    data = getattr(gv.video, "video_bytes", None) or getattr(gv.video, "bytes", None)
-    if not data:
-        raise RuntimeError("No video bytes received after download()")
+    Beispiel für questions_json:
+    [
+      {"type": "FULL_NAME"},
+      {"type": "EMAIL"},
+      {"type": "PHONE"},
+      {"type": "CUSTOM", "label": "Ihre Nachricht", "key": "message"}
+    ]
+    """
+    session, base_url = _client()
 
-    # Zielpfad bestimmen
-    if output_path:
-        filepath = Path(output_path)
-        if filepath.is_dir():
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"video_{timestamp}.mp4"
-            filepath = filepath / filename
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-    else:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"video_{timestamp}.mp4"
-        filepath = OUTPUT_DIR / filename
+    # Falls keine page_id mitgegeben, nutze die aus der .env
+    if not page_id:
+        page_id = os.getenv("META_PAGE_ID")
+        if not page_id:
+            raise RuntimeError("META_PAGE_ID not set and page_id not provided")
 
-    # Video speichern
-    filepath.write_bytes(data)
-    logging.info("Video saved to: %s", filepath)
+    url = f"{base_url}/{page_id}/leadgen_forms"
 
-    return str(filepath.absolute())
+    # Standard-Fragen falls keine angegeben
+    if not questions_json:
+        questions_json = '[{"type": "FULL_NAME"}, {"type": "EMAIL"}, {"type": "PHONE"}]'
+
+    data = {
+        "name": name,
+        "privacy_policy": {"url": privacy_policy_url},
+        "questions": questions_json,
+        "thank_you_page": {
+            "title": "Vielen Dank!",
+            "body": thank_you_text
+        },
+        "locale": locale
+    }
+
+    if follow_up_url:
+        data["thank_you_page"]["button_type"] = button_type
+        data["thank_you_page"]["button_text"] = "Weiter"
+        data["thank_you_page"]["website_url"] = follow_up_url
+
+    resp = session.post(url, json=data)
+    result = resp.json()
+
+    logging.info(f"Lead form created: {result}")
+    return str(result)
+
+
+@mcp.tool()
+def marketing_get_leads(
+    form_id: str,
+    limit: int = 100
+) -> str:
+    """
+    Rufe Leads aus einer Lead Form ab.
+
+    Args:
+        form_id: ID der Lead Form
+        limit: Maximale Anzahl Leads (default: 100)
+    """
+    session, base_url = _client()
+
+    url = f"{base_url}/{form_id}/leads"
+    params = {"limit": limit}
+
+    resp = session.get(url, params=params)
+    result = resp.json()
+
+    logging.info(f"Fetched {len(result.get('data', []))} leads")
+    return str(result)
 
 
 # -----------------------------------------------------------------------------

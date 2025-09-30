@@ -1,0 +1,9 @@
+ gh auth login
+
+  Then follow the prompts to log in. After that, run:
+
+  gh repo create meta-graph --public --source=.
+  --remote=origin --push
+
+  This will create the repository and push your code in one
+   command.

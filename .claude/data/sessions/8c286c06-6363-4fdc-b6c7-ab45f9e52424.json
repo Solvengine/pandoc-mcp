@@ -1,0 +1,6 @@
+{
+  "session_id": "8c286c06-6363-4fdc-b6c7-ab45f9e52424",
+  "prompts": [
+    "in analogy to @mcp_server.py i want to create an mcp server that wraps meta graph api. the required functionalities are in @plan.md. ultrathink to create an implemenation plan and consult arcon mcp with developer documentation of archon"
+  ]
+}

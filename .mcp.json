@@ -44,6 +44,11 @@
       "cwd": "/Users/benedikt.hoheisel/mcp/veo-mcp",
       "env": { "GOOGLE_API_KEY": "AIzaSyDDZb83SWYjFM0HuX7GeizIY3Cz6ttitgc" ,
       "PYTHONUNBUFFERED": "1"}
+    },
+    "meta-graph": {
+      "command": "/Users/benedikt.hoheisel/mcp/meta-graph/venv/bin/python",
+      "args": ["mcp_server.py"],
+      "cwd": "/Users/benedikt.hoheisel/mcp/meta-graph"
     }
   }
 }
