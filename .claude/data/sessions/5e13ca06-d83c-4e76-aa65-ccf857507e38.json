@@ -1,0 +1,14 @@
+{
+  "session_id": "5e13ca06-d83c-4e76-aa65-ccf857507e38",
+  "prompts": [
+    "teste den mcp server erstelle ein test html und konvertiere es mit mcp server zu docx",
+    "das sieht gut aus. jetzt erstelle ein dockument mit 3 leven von \u00fcbeschriften in unterschiedlichen farben und schriftwarten und einer tabelle und konvertiere zu docx",
+    "kann ich auch ein template in word vorgeben?",
+    "welche stylings werden im docx template gesetzt?",
+    "welche headings werden genutzt?",
+    "werden die headings die im word template definiert werden genutzt?",
+    "ja",
+    "das heisst die titel definitionen von native word docx werde nicht gesetzt",
+    "bin ich im erstellten word in der lage alle stylings von beispielsweise Heading 1 auf einmal zu \u00e4ndern?"
+  ]
+}

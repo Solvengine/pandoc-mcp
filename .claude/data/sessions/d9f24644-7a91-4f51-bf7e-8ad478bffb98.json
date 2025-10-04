@@ -1,0 +1,9 @@
+{
+  "session_id": "d9f24644-7a91-4f51-bf7e-8ad478bffb98",
+  "prompts": [
+    "erstelle auf basis von @mcp-server.py einen analogen mcp server f\u00fcr pypadnoc https://pandoc.org/using-the-pandoc-api.html#. es sollen html zu word konvertiert werden und footer und header gesetzt werden k\u00f6nnen",
+    "installiere die pakete",
+    "bitte in venv installieren",
+    "source venv/bin/activate"
+  ]
+}

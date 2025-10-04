@@ -5,50 +5,22 @@
       "url": "http://localhost:8051/mcp"
     },
     "firecrawl": {
-          "type": "stdio",
-          "command": "npx",
-          "args": [
-            "-y",
-            "firecrawl-mcp"
-          ],
-          "env": {
-            "FIRECRAWL_API_KEY": "fc-6d3801c297654f82bf6d36f7935a2a8a"
-          }
-        },
-        "stability-ai": {
-          "type": "stdio",
-          "command": "npx",
-          "args": [
-            "-y",
-            "mcp-server-stability-ai"
-          ],
-          "env": {
-            "STABILITY_AI_API_KEY": "sk-eRxaGLKyANV9v6vI3CjZoTopakQqODmkzLC2JDq8oCKtZOIj",
-            "IMAGE_STORAGE_DIRECTORY": "/Users/benedikt.hoheisel/Coding/KI/Marketing/stability-images"
-          }
-        },
-        "meta-ads": {
+      "type": "stdio",
       "command": "npx",
-      "args": ["-y", "meta-ads-mcp"],
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
       "env": {
-        "META_ACCESS_TOKEN": "EAFghI7jTaRYBPo296Cr3gO7pJZCGwNaHWmTn9D3CnvPxWiVQ1SFT6LAI7ZBc598DvjmmsuVPvPWAZB0t67ZANfripeIActw5hJzJPovRAtnCaY5wlqkWxe0aSRWZBuWbGvD680Lz60dgownKe6tWNZAmEHItZB0pCJsPkZBBfSxJEuDc2qhsbTZA84kKbmnQCwwsZD"
+        "FIRECRAWL_API_KEY": "fc-6d3801c297654f82bf6d36f7935a2a8a"
       }
     },
-    "MetaGraph": {
-      "type": "http",
-      "url": "http://localhost:8080/mcp/"
-    },
-    "veo": {
-      "command": "/Users/benedikt.hoheisel/mcp/veo-mcp/venv/bin/python",
-      "args": ["mcp_server.py"],
-      "cwd": "/Users/benedikt.hoheisel/mcp/veo-mcp",
-      "env": { "GOOGLE_API_KEY": "AIzaSyDDZb83SWYjFM0HuX7GeizIY3Cz6ttitgc" ,
-      "PYTHONUNBUFFERED": "1"}
-    },
-    "meta-graph": {
-      "command": "/Users/benedikt.hoheisel/mcp/meta-graph/venv/bin/python",
-      "args": ["mcp_server.py"],
-      "cwd": "/Users/benedikt.hoheisel/mcp/meta-graph"
+    "pandoc": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "/Users/benedikt.hoheisel/mcp/pandoc-mcp/mcp_server.py"
+      ]
     }
   }
 }
