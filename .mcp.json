@@ -17,7 +17,7 @@
     },
     "pandoc": {
       "type": "stdio",
-      "command": "python3",
+      "command": "/Users/benedikt.hoheisel/mcp/pandoc-mcp/venv/bin/python",
       "args": [
         "/Users/benedikt.hoheisel/mcp/pandoc-mcp/mcp_server.py"
       ]
