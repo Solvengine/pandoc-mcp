@@ -1,0 +1,18 @@
+{
+  "session_id": "1ad6858f-a694-4ceb-9657-1f54a94b3126",
+  "prompts": [
+    "add a functionality to mcp server to convert md -> docx as well",
+    "is there a opttion that tables are never split accross pages",
+    "please generate a long md file with table and test the creation of docx",
+    "for test_long_output i receive: Word experienced an error trying to open the file.\nTry these suggestions.\n* Check the file permissions for the document or drive.\n* Make sure there is sufficient free memory and disk space.\n* Open the file with the Text Recovery converter.\n(test_long_output.docx)",
+    "after the table of content a page break should be inserted do i need to to this in the template?",
+    "i see no pagebreak",
+    "that works. i would like to have a first title page too then the toc then the rest starting with ghe first chapter. how can i do this?",
+    "please option 1",
+    "looks good but page breakt before toc or after title page is missing",
+    "it looks better but toc start on page 1",
+    "perfect! is it possible to include a logo on the tilte page?",
+    "here the logo @assets/logo_solvengine.png ",
+    "is it possible to center more?"
+  ]
+}

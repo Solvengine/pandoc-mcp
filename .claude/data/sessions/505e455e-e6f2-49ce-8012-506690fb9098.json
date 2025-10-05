@@ -1,6 +1,9 @@
 {
   "session_id": "505e455e-e6f2-49ce-8012-506690fb9098",
   "prompts": [
-    "please analyze the project the mcp server should be able to transfer page breaks to word and to create a dynamic table of content in word"
+    "please analyze the project the mcp server should be able to transfer page breaks to word and to create a dynamic table of content in word",
+    "do it",
+    "i added a template in @templates/solvengine.docx can you use this as default template in the mcp server",
+    "now create a test html (long) and rund a test with this html"
   ]
 }

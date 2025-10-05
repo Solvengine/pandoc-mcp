@@ -1,0 +1,11 @@
+{
+  "session_id": "3bfdf605-9b99-41e4-9520-df1e151e45ee",
+  "prompts": [
+    "ok",
+    "i geht this: Creating a table of contents? Start by applying a heading style from the Styles gallery to the selected text",
+    "the toc is created but the headings are no word headings that the toc can identify",
+    "i exchanged the template. try agaoin with @templates/solvengine.docx ",
+    "that works perfect",
+    "is it possible to use a first page in the template that is always preserved?"
+  ]
+}

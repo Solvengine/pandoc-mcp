@@ -1,0 +1,11 @@
+{
+  "session_id": "cb8f70ed-ac5d-4e03-ba5b-04aae90fb886",
+  "prompts": [
+    "create a arbitraty test .md file and convert it to docx using mcp server pandoc",
+    "make the mcp server work directly. i am missing title page, toc why has this not been generated",
+    "make this the default behaviour when calling mcp server to create docx",
+    "go",
+    "is there an optoin to include a logo in the title page",
+    "make the login inclusion default too"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "session_id": "c966fa0e-dc33-4b87-b1f1-11df2ec29b24",
+  "prompts": [
+    "create a colourfull html report and convert it to docx using template @solvengine.docx with toc",
+    "i changed the template regenerate",
+    "i want the table format to applied as well",
+    "are there any other style options that pandoc can apply to word",
+    "please explain how i set the styles of the list in word exaclty",
+    "how to define table style",
+    "the style is called solvengineTable",
+    "yes"
+  ]
+}
